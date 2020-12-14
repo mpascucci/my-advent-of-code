@@ -7,6 +7,12 @@ rows=${#lines[@]}
 line0="${lines[0]}"
 cols=${#line0}
 
+datastr=""
+for line in ${lines[@]};do
+    datastr+=$line
+done
+echo $datastr
+
 echo "Loaded map $rows x $cols"
 
 min () {
@@ -30,6 +36,12 @@ max () {
     fi
 }
 
+idx2d () {
+    local row=$1
+    local col=$2    
+    echo $(( col + row*cols ))
+}
+
 check_around () {
     local row=$1
     local col=$2
@@ -45,7 +57,7 @@ check_around () {
     c1=$(( col+1 ))
     c1=$( min $c1 $(( $cols-1 )) )
 
-    local r c ept occ cr cp
+    local r c ept occ cr cp id
     ept=0
     occ=0
 
@@ -55,8 +67,10 @@ check_around () {
                 # do not count the center
                 continue
             fi
-            cr=${lines[$r]}
-            cp=${cr:$c:1}
+
+            id=$( idx2d $r $c )
+            cp=${datastr:$id:1}
+
             if [[ $cp == 'L' ]]; then
                 ept=$(( ept + 1))
             elif [[ $cp == '#' ]]; then
@@ -71,12 +85,8 @@ update_seat () {
     local row=$1
     local col=$2
 
-    local id=$(( col + row*cols ))
-
-
-    local old cr
-    cr=${lines[$row]}
-    old=${cr:$col:1}
+    local id=$( idx2d $row $col )
+    local old=${datastr:$id:1}
     
     local ept_occ ept occ
     # do not update empty places
@@ -99,7 +109,7 @@ update_seat () {
     fi
     
     #echo "($ept,$occ) $old-->$new" "${cr:0:$col}${new}${cr:$col+1}" >&2
-    cr=${newlines[$row]}
+    #cr=${newlines[$row]}
 
     echo $new > "temp_$id"
 
@@ -108,51 +118,71 @@ update_seat () {
 
 read_new () {
     local files fn newrow r c newlines cr
-    files=($(ls temp_*))
-    fn=${#files}
-    declare -a newlines;
-    for (( r=0; r<$rows; r++ )); do
-        newrow=""
-        for (( c=0; c<$cols; c++ )); do
-        newrow+='-'
-        done
-        newlines=("${newlines[@]}" $newrow)
-    done
+    local files=($(ls temp_*))
+    local fn=${#files}
+    #local s r
+    #for (( r=0; r<$rows; r++ )); do
+    #    newrow=""
+    #    for (( c=0; c<$cols; c++ )); do
+    #    newrow+='-'
+    #    done
+    #    newlines=("${newlines[@]}" $newrow)
+    #done
 
+    local s="$datastr"
+
+    local f id
     for f in ${files[@]}; do
         read v < $f
         id=$(sed 's/temp_//' <<< $f)
-        c=$((id%cols))
-        r=$((id/cols))
-        cr=${newlines[$r]}
-        newlines[r]=${cr:0:c}$v${cr:c+1}
+        id=$(( id + 1 ))
+        #echo $f $id $v >&2
+        s=$( sed s/./$v/$id <<< $s)
     done
-    echo ${newlines[@]}
+    echo $s
 }
 
-# copy array
+print_datastr () {
+    local a s r
+    s=$1
+    for r in $( seq 0 $rows); do
+        a=$(( $r*$rows ))
+        printf "${s:$a:$cols}\n"
+    done
+}
 
-#printf "%s\n" "${lines[@]}"
-printf "Running simulation"
+#print_datastr $datastr
+printf "Running simulation\n"
+#update_seat 0 0
+#datastr=$( read_new )
+#print_datastr $datastr
+#\rm temp_*
+
+
 
 while [[ 1 = 1 ]]; do
     for (( r=0; r<$rows; r++ )); do
         for (( c=0; c<$cols; c++ )); do
-            update_seat $r $c &
+            update_seat $r $c $datastr &
         done
     done
     printf "."
-    #wait
-    newlines=($( read_new ))
+    wait
+    new_datastr=($( read_new ))
     \rm temp_*
-    #echo
-    #printf "%s\n" "${newlines[@]}"
-    if [[ ${lines[@]} == ${newlines[@]} ]]; then break; fi
-    lines=("${newlines[@]}")
+
+    #echo "---"
+    #print_datastr $datastr
+    #print_datastr $new_datastr
+
+    if [[ $new_datastr == $datastr ]]; then break; fi
+    datastr="$new_datastr"
+    #break       
 done
+print_datastr $datastr
 
 
-s1=$( grep -o "#" <<< ${lines[@]} | wc -l)
+s1=$( grep -o "#" <<< $datastr | wc -l)
 echo
 echo "Solution 1: $s1"
 
