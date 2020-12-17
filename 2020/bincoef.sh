@@ -1,8 +1,8 @@
 #/bin/bash
-
 # calculate the (k n) binomial coefficient
 # this gives the permutations of k elements out of n, disregarding order
 # eg if n={1,2,3} has 3 such possible permutations (e.g. 12,13,23)
+
 n=$1
 k=$2
 

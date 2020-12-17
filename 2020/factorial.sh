@@ -1,6 +1,6 @@
 #/bin/bash
+# calculate the exact factorial  of $1
 
-# calculate the factorial  of n
 n=$1
 p=1
 for i in $( seq 1 $n ); do

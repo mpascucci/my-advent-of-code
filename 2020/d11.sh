@@ -186,7 +186,8 @@ s1=$( grep -o "#" <<< $datastr | wc -l)
 echo
 echo "Solution 1: $s1"
 
-       
+# Solution 2 is too slow with this implementation in bash.
+# The python script p11.py implements the same algorithm
 
  
 

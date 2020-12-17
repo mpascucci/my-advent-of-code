@@ -1,4 +1,7 @@
 #!/bin/bash
+# return armin argmax min max of array-like string $1
+
+
 a=($1)
 argmin=0
 argmax=0
