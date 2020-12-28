@@ -65,16 +65,63 @@ y=0
 
 wpx=(100,-10)
 
-#instrsN=10
-for (( i=0; i<instrsN; i++ ));do
-    instr=${instrs[$i]}
+#for (( i=0; i<instrsN; i++ ));do
+#    instr=${instrs[$i]}
+#
+#    printf "($x,$y) H:$head |--$instr--> "
+#    parse $instr
+#    echo "H:$head ($x,$y)"
+#done
 
-    printf "($x,$y) H:$head |--$instr--> "
-    parse $instr
-    echo "H:$head ($x,$y)"
+#x=$( sed "s/-//" <<< $x )
+#y=$( sed "s/-//" <<< $y )
+#echo "Solution 1 = $(( x+y ))"
+
+# =============== Part2
+
+declare -i sx sy wpx wpy
+
+parse2 () {
+    local instr=$1
+    local -i x=$wpx
+    local -i y=$wpy
+    case $instr in
+        N*) # move north
+            wpy=$(( wpy + ${instr#N} ));;
+        S*) # move north
+            wpy=$(( wpy - ${instr#S} ));;
+        E*) # move north
+            wpx=$(( wpx + ${instr#E} ));;
+        W*) # move north
+            wpx=$(( wpx - ${instr#W} ));;
+        L270|R90) # turn right once
+            wpx=$y; wpy=-$x;;   
+        R270|L90) # turn left once
+            wpx=-$y; wpy=$x;;   
+        R180|L180) # invert direction
+            wpx=-$x; wpy=-$y;;
+        F*) # move the sheep to the waypoint
+            local -i n=${instr#F}
+            sx=$(( sx + x*n ))
+            sy=$(( sy + y*n ));;
+        *) # other movements
+            echo "Wrong instruction: $instr"
+     esac
+}
+
+readarray -t instrs < d12_data.txt
+
+sx=0
+sy=0
+wpx=10
+wpy=1
+for (( i=0; i<${#instrs[@]}; i++ ));do
+    instr=${instrs[$i]}
+    printf "($sx,$sy) wp:($wpx,$wpy) |--$instr--> "
+    parse2 $instr
+    echo "($sx,$sy) wp:($wpx,$wpy)"
 done
 
-x=$( sed "s/-//" <<< $x )
-y=$( sed "s/-//" <<< $y )
-echo "Solution 1 = $(( x+y ))"
-
+sx=$( sed "s/-//" <<< $sx )
+sy=$( sed "s/-//" <<< $sy )
+echo "Solution 2 = $(( sx+sy ))"

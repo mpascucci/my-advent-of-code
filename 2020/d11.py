@@ -7,7 +7,8 @@ This is a temporary script file.
 
 import numpy as np
 
-with open("/home/marco/Dev/my-advent-of-code/2020/d11_data.txt") as f:
+
+with open("d11_data.txt") as f:
     lines=f.read()
 
 vals={

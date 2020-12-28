@@ -8,8 +8,10 @@ if [[ $# -lt 2 ]]; then
 fi
 
 out=0
-v=$1
-a=($2)
+
+v=$2
+a=($1)
+
 for x in ${a[@]}; do
     if [[ $x = $v ]]; then
         out=1
@@ -17,5 +19,3 @@ for x in ${a[@]}; do
     fi
 done
 echo $out
-
-[[ ${a[@]} =~ $v ]] && echo 1 || echo 0
