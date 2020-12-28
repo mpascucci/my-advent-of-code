@@ -7,6 +7,7 @@ This is a temporary script file.
 
 import numpy as np
 
+
 with open("d11_data.txt") as f:
     lines=f.read()
 

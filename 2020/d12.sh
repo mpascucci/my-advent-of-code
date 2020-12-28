@@ -125,4 +125,3 @@ done
 sx=$( sed "s/-//" <<< $sx )
 sy=$( sed "s/-//" <<< $sy )
 echo "Solution 2 = $(( sx+sy ))"
-
