@@ -1,6 +1,6 @@
 # My advent of code
 
-## 2020: the bash year
+## 2020: have a bash!
 This year I tried to solve the games in `bash scripting`... 2020 has not been an easy year ;)
 
 - Part 1 of all enigms is solved in bash.
